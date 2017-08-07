@@ -1,0 +1,23 @@
+{
+  "name": "js.tetris",
+  "version": "1.0.0",
+  "description": "Simple Tetris game",
+  "main": "index.js",
+  "dependencies": {
+    "webpack": "^3.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smikheiev/js.tetris.git"
+  },
+  "author": "Serhii Mikheiev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/smikheiev/js.tetris/issues"
+  },
+  "homepage": "https://github.com/smikheiev/js.tetris#readme"
+}
