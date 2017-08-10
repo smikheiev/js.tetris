@@ -31,7 +31,7 @@ export default class BaseBlock {
         if (!this._isCellPositionOk(x, y)) {
             return undefined;
         }
-        return this._currentMatrix[x][y] !== 0;
+        return this._currentMatrix[y][x] !== 0;
     }
 
     rotate() {
@@ -40,7 +40,7 @@ export default class BaseBlock {
     }
 
     rotateBack() {
-        this._currentRotation = (this._currentMatrix - 1 + this._rotationsCount) % this._rotationsCount;
+        this._currentRotation = (this._currentRotation - 1 + this._rotationsCount) % this._rotationsCount;
         this._currentMatrix = this._matrices[this._currentRotation];
     }
 
