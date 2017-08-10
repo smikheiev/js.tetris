@@ -1,4 +1,5 @@
-import FieldLogic from './logic/fieldlogic'
+import RootContainer from './view/rootcontainer'
+import RootLogic from './logic/rootlogic'
 import * as PIXI from 'pixi.js'
 
 export default class Tetris {
@@ -12,6 +13,9 @@ export default class Tetris {
         });
         document.body.appendChild(this._app.view);
 
-        let fieldLogic = new FieldLogic(8, 10);
+        this._rootLogic = new RootLogic();
+
+        this._rootContainer = new RootContainer(this._rootLogic);
+        this._app.stage.addChild(this._rootContainer);
     }
 }

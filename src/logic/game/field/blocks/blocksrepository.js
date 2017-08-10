@@ -1,4 +1,4 @@
-import BlockType from '../../const/blocktype'
+import BlockType from '../../../../const/blocktype'
 import BlockI from './block_i'
 import BlockJ from './block_j'
 import BlockL from './block_l'

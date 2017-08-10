@@ -1,8 +1,8 @@
 import BlockRepository from './blocks/blocksrepository'
-import BlockType from '../const/blocktype'
+import BlockType from '../../../const/blocktype'
 
 export default class FieldLogic {
-    constructor(width, height) {
+    constructor(width = 10, height = 22) {
         this._width = width;
         this._height = height;
 
@@ -21,6 +21,30 @@ export default class FieldLogic {
         this._generateNewBlock();
         this._updateFieldForCurrentBlock(false);
         this._printField();
+    }
+
+    // Public
+
+    get width() { return this._width; }
+    get height() { return this._height; }
+
+    addOnFieldChangedCallback(fn) {
+        this._onFieldChangeCallback = fn;
+    }
+
+    isCellBusy(x, y) {
+        if (!this._isCellPositionOk(x, y)) {
+            return false;
+        }
+
+        return this.getCellValue(x, y) !== 0;
+    }
+
+    getCellValue(x, y) {
+        if (!this._isCellPositionOk(x, y)) {
+            return undefined;
+        }
+        return this._field[x][y];
     }
 
     // Private
@@ -71,6 +95,10 @@ export default class FieldLogic {
 
         this._updateFieldForCurrentBlock(false);
         this._printField();
+
+        if (this._onFieldChangeCallback) {
+            this._onFieldChangeCallback();
+        }
     }
 
     _moveRight() {
@@ -88,6 +116,10 @@ export default class FieldLogic {
 
         this._updateFieldForCurrentBlock(false);
         this._printField();
+
+        if (this._onFieldChangeCallback) {
+            this._onFieldChangeCallback();
+        }
     }
 
     _moveDown() {
@@ -108,6 +140,10 @@ export default class FieldLogic {
         }
 
         this._printField();
+
+        if (this._onFieldChangeCallback) {
+            this._onFieldChangeCallback();
+        }
     }
 
     // If there is no enough space on left or right for rotation -
@@ -147,6 +183,10 @@ export default class FieldLogic {
 
         this._updateFieldForCurrentBlock(false);
         this._printField();
+
+        if (this._onFieldChangeCallback) {
+            this._onFieldChangeCallback();
+        }
     }
 
     _getMaxBlockCellYOnField() {
@@ -209,7 +249,7 @@ export default class FieldLogic {
 
                 let fieldX = this._currentBlock.fieldPositionX + blockX;
                 let fieldY = this._currentBlock.fieldPositionY + blockY;
-                if (this._isCellBusy(fieldX, fieldY)) {
+                if (this.isCellBusy(fieldX, fieldY)) {
                     return true;
                 }
             }
@@ -251,26 +291,11 @@ export default class FieldLogic {
         this._currentBlock.fieldPositionY = -this._currentBlock.height;
     }
 
-    _isCellBusy(x, y) {
-        if (!this._isCellPositionOk(x, y)) {
-            return false;
-        }
-
-        return this._getCellValue(x, y) !== 0;
-    }
-
     _isCellPositionOk(x, y) {
         if (x >= 0 && x < this._width && y >= 0 && y < this._height) {
             return true;
         }
         return false;
-    }
-
-    _getCellValue(x, y) {
-        if (!this._isCellPositionOk(x, y)) {
-            return undefined;
-        }
-        return this._field[x][y];
     }
 
     _setCellValue(x, y, value) {
@@ -284,7 +309,7 @@ export default class FieldLogic {
         let fieldString = '';
         for (let y = 0; y < this._height; ++y) {
             for (let x = 0; x < this._width; ++x) {
-                fieldString += this._getCellValue(x, y);
+                fieldString += this.getCellValue(x, y);
                 fieldString += ' ';
             }
             fieldString += '\n';
