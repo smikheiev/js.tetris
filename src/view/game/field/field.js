@@ -1,5 +1,5 @@
+import AssetsManager from '../../../utils/assetsmanager'
 import BlockType from '../../../const/blocktype'
-
 import * as PIXI from 'pixi.js'
 
 export default class Field extends PIXI.Container {
@@ -14,18 +14,7 @@ export default class Field extends PIXI.Container {
         this._blocksContainer = new PIXI.Container();
         this.addChild(this._blocksContainer);
 
-        PIXI.loader
-            .add([
-                'assets/field/background.png',
-                'assets/field/block_blue.png',
-                'assets/field/block_cyan.png',
-                'assets/field/block_green.png',
-                'assets/field/block_orange.png',
-                'assets/field/block_purple.png',
-                'assets/field/block_red.png',
-                'assets/field/block_yellow.png'
-            ])
-            .load(this._init.bind(this));
+        this._init();
     }
 
     // Private
@@ -38,13 +27,12 @@ export default class Field extends PIXI.Container {
     }
 
     _drawBackground() {
-        let bgTex = PIXI.loader.resources['assets/field/background.png'].texture;
         for (let fieldX = 0; fieldX < this._fieldLogic.width; ++fieldX) {
             for (let fieldY = 0; fieldY < this._fieldLogic.height; ++fieldY) {
-                let bgSprite = new PIXI.Sprite(bgTex);
+                let bgSprite = AssetsManager.getSprite('field', 'background')
                 this._bgContainer.addChild(bgSprite);
-                bgSprite.x = fieldX * bgTex.width;
-                bgSprite.y = fieldY * bgTex.height;
+                bgSprite.x = fieldX * bgSprite.width;
+                bgSprite.y = fieldY * bgSprite.height;
             }
         }
     }
@@ -58,32 +46,31 @@ export default class Field extends PIXI.Container {
                 }
 
                 let blockType = this._fieldLogic.getCellValue(fieldX, fieldY);
-                let blockTexName = this._getTextureNameForBlockType(blockType);
-                let blockTex = PIXI.loader.resources[blockTexName].texture;
-                let blockSprite = new PIXI.Sprite(blockTex);
+                let blockSpriteName = this._getSpriteNameForBlockType(blockType);
+                let blockSprite = AssetsManager.getSprite('field', blockSpriteName);
                 this._blocksContainer.addChild(blockSprite);
-                blockSprite.x = fieldX * blockTex.width;
-                blockSprite.y = fieldY * blockTex.height;
+                blockSprite.x = fieldX * blockSprite.width;
+                blockSprite.y = fieldY * blockSprite.height;
             }
         }
     }
 
-    _getTextureNameForBlockType(blockType) {
+    _getSpriteNameForBlockType(blockType) {
         switch (blockType) {
             case BlockType.I:
-                return 'assets/field/block_blue.png';
+                return 'block_blue';
             case BlockType.J:
-                return 'assets/field/block_cyan.png';
+                return 'block_cyan';
             case BlockType.L:
-                return 'assets/field/block_green.png';
+                return 'block_green';
             case BlockType.O:
-                return 'assets/field/block_orange.png';
+                return 'block_orange';
             case BlockType.S:
-                return 'assets/field/block_purple.png';
+                return 'block_purple';
             case BlockType.T:
-                return 'assets/field/block_red.png';
+                return 'block_red';
             case BlockType.Z:
-                return 'assets/field/block_yellow.png';
+                return 'block_yellow';
         }
         return '';
     }
