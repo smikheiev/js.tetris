@@ -1,4 +1,4 @@
-import AssetsManager from '../../../utils/assetsmanager'
+import SpritesPool from '../../../utils/spritespool'
 import BlockType from '../../../const/blocktype'
 import * as PIXI from 'pixi.js'
 
@@ -11,8 +11,8 @@ export default class Field extends PIXI.Container {
         this._bgContainer = new PIXI.Container();
         this.addChild(this._bgContainer);
 
-        this._blocksContainer = new PIXI.Container();
-        this.addChild(this._blocksContainer);
+        this._cellsContainer = new PIXI.Container();
+        this.addChild(this._cellsContainer);
 
         this._init();
     }
@@ -20,6 +20,11 @@ export default class Field extends PIXI.Container {
     // Private
 
     _init() {
+        this._cellSprites = new Array(this._fieldLogic.width);
+        for (let x = 0; x < this._fieldLogic.width; ++x) {
+            this._cellSprites[x] = new Array(this._fieldLogic.height);
+        }
+
         this._drawBackground();
         this._drawField();
 
@@ -29,7 +34,7 @@ export default class Field extends PIXI.Container {
     _drawBackground() {
         for (let fieldX = 0; fieldX < this._fieldLogic.width; ++fieldX) {
             for (let fieldY = 0; fieldY < this._fieldLogic.height; ++fieldY) {
-                let bgSprite = AssetsManager.getSprite('field', 'background')
+                let bgSprite = SpritesPool.getSprite('field', 'background');
                 this._bgContainer.addChild(bgSprite);
                 bgSprite.x = fieldX * bgSprite.width;
                 bgSprite.y = fieldY * bgSprite.height;
@@ -38,19 +43,29 @@ export default class Field extends PIXI.Container {
     }
 
     _drawField() {
-        this._blocksContainer.removeChildren(0, this._blocksContainer.children.length);
+        this._cellsContainer.removeChildren(0, this._cellsContainer.children.length);
         for (let fieldX = 0; fieldX < this._fieldLogic.width; ++fieldX) {
             for (let fieldY = 0; fieldY < this._fieldLogic.height; ++fieldY) {
+                let cellSprite = this._cellSprites[fieldX][fieldY];
+                this._cellSprites[fieldX][fieldY] = undefined;
+                if (cellSprite !== undefined) {
+                    this._cellsContainer.removeChild(cellSprite);
+                    SpritesPool.releaseSprite(cellSprite);
+                }
+
                 if (!this._fieldLogic.isCellBusy(fieldX, fieldY)) {
                     continue;
                 }
 
                 let blockType = this._fieldLogic.getCellValue(fieldX, fieldY);
-                let blockSpriteName = this._getSpriteNameForBlockType(blockType);
-                let blockSprite = AssetsManager.getSprite('field', blockSpriteName);
-                this._blocksContainer.addChild(blockSprite);
-                blockSprite.x = fieldX * blockSprite.width;
-                blockSprite.y = fieldY * blockSprite.height;
+                let spriteName = this._getSpriteNameForBlockType(blockType);
+                cellSprite = SpritesPool.getSprite('field', spriteName);
+
+                this._cellsContainer.addChild(cellSprite);
+                this._cellSprites[fieldX][fieldY] = cellSprite;
+
+                cellSprite.x = fieldX * cellSprite.width;
+                cellSprite.y = fieldY * cellSprite.height;
             }
         }
     }
