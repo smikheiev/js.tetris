@@ -20,7 +20,6 @@ export default class FieldLogic {
 
         this._generateNewBlock();
         this._updateFieldForCurrentBlock(false);
-        this._printField();
     }
 
     // Public
@@ -94,7 +93,6 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-        this._printField();
 
         if (this._onFieldChangeCallback) {
             this._onFieldChangeCallback();
@@ -115,7 +113,6 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-        this._printField();
 
         if (this._onFieldChangeCallback) {
             this._onFieldChangeCallback();
@@ -134,12 +131,14 @@ export default class FieldLogic {
         if (rollback) {
             this._currentBlock.fieldPositionY -= 1;
             this._updateFieldForCurrentBlock(false);
+
+            let removedRows = this._removeFullRows();
+            this._moveRowsDownAfterRemoving(removedRows);
+
             this._generateNewBlock();
         } else {
             this._updateFieldForCurrentBlock(false);
         }
-
-        this._printField();
 
         if (this._onFieldChangeCallback) {
             this._onFieldChangeCallback();
@@ -182,7 +181,6 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-        this._printField();
 
         if (this._onFieldChangeCallback) {
             this._onFieldChangeCallback();
@@ -289,6 +287,52 @@ export default class FieldLogic {
         }
         this._currentBlock.fieldPositionX = Math.ceil((this._width - this._currentBlock.width) / 2);
         this._currentBlock.fieldPositionY = -this._currentBlock.height;
+    }
+
+    _removeFullRows() {
+        let fullRows = [];
+        for (let fieldY = this._height - 1; fieldY >= 0; --fieldY) {
+            let isRowFull = true;
+            for (let fieldX = 0; fieldX < this._width; ++fieldX) {
+                if (!this.isCellBusy(fieldX, fieldY)) {
+                    isRowFull = false;
+                    break;
+                }
+            }
+            if (isRowFull) {
+                for (let fieldX = 0; fieldX < this._width; ++fieldX) {
+                    this._setCellValue(fieldX, fieldY, 0);
+                }
+                fullRows.push(fieldY);
+            }
+        }
+        return fullRows;
+    }
+
+    _moveRowsDownAfterRemoving(removedRows) {
+        if (removedRows.length === 0) {
+            return;
+        }
+
+        let moveOffset = 1;
+        let lastRemovedRow = removedRows[0];
+        for (let fieldY = lastRemovedRow - 1; fieldY >= 0; --fieldY) {
+            if (removedRows.indexOf(fieldY) >= 0) {
+                moveOffset += 1;
+                continue;
+            }
+
+            let moveToY = fieldY + moveOffset;
+            for (let fieldX = 0; fieldX < this._width; ++fieldX) {
+                if (fieldY === 0) {
+                    this._setCellValue(fieldX, fieldY, 0);
+                } else {
+                    let cellValue = this.getCellValue(fieldX, fieldY);
+                    this._setCellValue(fieldX, fieldY, 0);
+                    this._setCellValue(fieldX, moveToY, cellValue);
+                }
+            }
+        }
     }
 
     _isCellPositionOk(x, y) {
