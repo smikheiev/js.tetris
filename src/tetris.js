@@ -31,5 +31,11 @@ export default class Tetris {
 
         this._rootContainer = new RootContainer(this._rootLogic);
         this._app.stage.addChild(this._rootContainer);
+
+        setTimeout(this._startGame.bind(this), 1000);
+    }
+
+    _startGame() {
+        this._rootLogic.startGame(10, 22)
     }
 }

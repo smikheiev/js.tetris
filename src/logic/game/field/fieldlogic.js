@@ -1,66 +1,32 @@
 import BlockRepository from './blocks/blocksrepository'
 import BlockType from '../../../const/blocktype'
+import FieldModel from './fieldmodel'
 
 export default class FieldLogic {
-    constructor(width = 10, height = 22) {
-        this._width = width;
-        this._height = height;
+    constructor() {
+        this._model = new FieldModel();
 
         this._blockRepository = new BlockRepository();
-
-        this._initField();
-
         this._currentBlock = undefined;
-
         this._predefinedBlocks = [
             // BlockType.L, BlockType.J, BlockType.T, BlockType.O, BlockType.S, BlockType.Z, BlockType.I
         ]
-
-        window.addEventListener("keydown", (event) => { this._handleKeyDown(event.keyCode); });
-
-        this._generateNewBlock();
-        this._updateFieldForCurrentBlock(false);
     }
 
     // Public
 
-    get width() { return this._width; }
-    get height() { return this._height; }
+    get model() { return this._model; }
 
-    addOnFieldChangedCallback(fn) {
-        this._onFieldChangeCallback = fn;
-    }
+    startGame(width, height) {
+        this._model.setSize(width, height);
 
-    isCellBusy(x, y) {
-        if (!this._isCellPositionOk(x, y)) {
-            return false;
-        }
+        this._generateNewBlock();
+        this._updateFieldForCurrentBlock(false);
 
-        return this.getCellValue(x, y) !== 0;
-    }
-
-    getCellValue(x, y) {
-        if (!this._isCellPositionOk(x, y)) {
-            return undefined;
-        }
-        return this._field[x][y];
+        window.addEventListener("keydown", (event) => { this._handleKeyDown(event.keyCode); });
     }
 
     // Private
-
-    _initField() {
-        if (this._width <= 0 || this._height <= 0) {
-            throw new Error('Wrong field size: ' + this._width + ', ' + this._height);
-        }
-
-        this._field = new Array(this._width);
-        for (let x = 0; x < this._width; ++x) {
-            this._field[x] = new Array(this._height);
-            for (let y = 0; y < this._height; ++y) {
-                this._field[x][y] = 0;
-            }
-        }
-    }
 
     _handleKeyDown(keyCode) {
         switch (keyCode) {
@@ -93,17 +59,13 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-
-        if (this._onFieldChangeCallback) {
-            this._onFieldChangeCallback();
-        }
     }
 
     _moveRight() {
         this._updateFieldForCurrentBlock(true);
         this._currentBlock.fieldPositionX += 1;
 
-        let rollback = (this._getMaxBlockCellXOnField() >= this._width);
+        let rollback = (this._getMaxBlockCellXOnField() >= this._model.width);
         if (!rollback) {
             rollback = this._isAnyBlockCellOverFieldCell();
         }
@@ -113,17 +75,13 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-
-        if (this._onFieldChangeCallback) {
-            this._onFieldChangeCallback();
-        }
     }
 
     _moveDown() {
         this._updateFieldForCurrentBlock(true);
         this._currentBlock.fieldPositionY += 1;
 
-        let rollback = (this._getMaxBlockCellYOnField() >= this._height);
+        let rollback = (this._getMaxBlockCellYOnField() >= this._model.height);
         if (!rollback) {
             rollback = this._isAnyBlockCellOverFieldCell();
         }
@@ -139,10 +97,6 @@ export default class FieldLogic {
         } else {
             this._updateFieldForCurrentBlock(false);
         }
-
-        if (this._onFieldChangeCallback) {
-            this._onFieldChangeCallback();
-        }
     }
 
     // If there is no enough space on left or right for rotation -
@@ -154,7 +108,7 @@ export default class FieldLogic {
         this._updateFieldForCurrentBlock(true);
         this._currentBlock.rotate();
 
-        let rollback = (this._getMaxBlockCellYOnField() >= this._height);
+        let rollback = (this._getMaxBlockCellYOnField() >= this._model.height);
         if (rollback) {
             this._currentBlock.rotateBack();
             this._updateFieldForCurrentBlock(false);
@@ -168,8 +122,8 @@ export default class FieldLogic {
             changeX = -minBlockX; // Move right
         } else {
             let maxBlockX = this._getMaxBlockCellXOnField();
-            if (maxBlockX >= this._width) {
-                changeX = this._width - maxBlockX - 1; // Move left
+            if (maxBlockX >= this._model.width) {
+                changeX = this._model.width - maxBlockX - 1; // Move left
             }
         }
         this._currentBlock.fieldPositionX += changeX;
@@ -181,10 +135,6 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-
-        if (this._onFieldChangeCallback) {
-            this._onFieldChangeCallback();
-        }
     }
 
     _getMaxBlockCellYOnField() {
@@ -247,7 +197,7 @@ export default class FieldLogic {
 
                 let fieldX = this._currentBlock.fieldPositionX + blockX;
                 let fieldY = this._currentBlock.fieldPositionY + blockY;
-                if (this.isCellBusy(fieldX, fieldY)) {
+                if (this._model.isCellBusy(fieldX, fieldY)) {
                     return true;
                 }
             }
@@ -268,9 +218,9 @@ export default class FieldLogic {
                 if (this._isCellPositionOk(fieldX, fieldY)) {
                     if (this._currentBlock.isCellBusy(blockX, blockY)) {
                         if (clearCells) {
-                            this._setCellValue(fieldX, fieldY, 0);
+                            this._model.setCell(fieldX, fieldY, null);
                         } else {
-                            this._setCellValue(fieldX, fieldY, this._currentBlock.blockType);
+                            this._model.setCell(fieldX, fieldY, this._currentBlock.blockType);
                         }
                     }
                 }
@@ -285,24 +235,22 @@ export default class FieldLogic {
         } else {
             this._currentBlock = this._blockRepository.getRandomBlock();
         }
-        this._currentBlock.fieldPositionX = Math.ceil((this._width - this._currentBlock.width) / 2);
+        this._currentBlock.fieldPositionX = Math.ceil((this._model.width - this._currentBlock.width) / 2);
         this._currentBlock.fieldPositionY = -this._currentBlock.height;
     }
 
     _removeFullRows() {
         let fullRows = [];
-        for (let fieldY = this._height - 1; fieldY >= 0; --fieldY) {
+        for (let fieldY = this._model.height - 1; fieldY >= 0; --fieldY) {
             let isRowFull = true;
-            for (let fieldX = 0; fieldX < this._width; ++fieldX) {
-                if (!this.isCellBusy(fieldX, fieldY)) {
+            for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
+                if (!this._model.isCellBusy(fieldX, fieldY)) {
                     isRowFull = false;
                     break;
                 }
             }
             if (isRowFull) {
-                for (let fieldX = 0; fieldX < this._width; ++fieldX) {
-                    this._setCellValue(fieldX, fieldY, 0);
-                }
+                this._model.clearRow(fieldY);
                 fullRows.push(fieldY);
             }
         }
@@ -323,41 +271,22 @@ export default class FieldLogic {
             }
 
             let moveToY = fieldY + moveOffset;
-            for (let fieldX = 0; fieldX < this._width; ++fieldX) {
+            for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
                 if (fieldY === 0) {
-                    this._setCellValue(fieldX, fieldY, 0);
+                    this._model.setCell(fieldX, fieldY, null);
                 } else {
-                    let cellValue = this.getCellValue(fieldX, fieldY);
-                    this._setCellValue(fieldX, fieldY, 0);
-                    this._setCellValue(fieldX, moveToY, cellValue);
+                    let cellValue = this._model.getCell(fieldX, fieldY);
+                    this._model.setCell(fieldX, fieldY, null);
+                    this._model.setCell(fieldX, moveToY, cellValue);
                 }
             }
         }
     }
 
     _isCellPositionOk(x, y) {
-        if (x >= 0 && x < this._width && y >= 0 && y < this._height) {
+        if (x >= 0 && x < this._model.width && y >= 0 && y < this._model.height) {
             return true;
         }
         return false;
-    }
-
-    _setCellValue(x, y, value) {
-        if (!this._isCellPositionOk(x, y)) {
-            return;
-        }
-        return this._field[x][y] = value;
-    }
-
-    _printField() {
-        let fieldString = '';
-        for (let y = 0; y < this._height; ++y) {
-            for (let x = 0; x < this._width; ++x) {
-                fieldString += this.getCellValue(x, y);
-                fieldString += ' ';
-            }
-            fieldString += '\n';
-        }
-        console.log(fieldString);
     }
 }

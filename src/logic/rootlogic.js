@@ -8,4 +8,8 @@ export default class RootLogic {
     // Public
 
     get gameLogic() { return this._gameLogic; }
+
+    startGame(width, height) {
+        this._gameLogic.startGame(width, height);
+    }
 }

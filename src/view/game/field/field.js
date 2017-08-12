@@ -6,7 +6,10 @@ export default class Field extends PIXI.Container {
     constructor(fieldLogic) {
         super()
 
-        this._fieldLogic = fieldLogic;
+        this._logic = fieldLogic;
+        this._model = fieldLogic.model;
+
+        this._cellSprites = [];
 
         this._bgContainer = new PIXI.Container();
         this.addChild(this._bgContainer);
@@ -14,58 +17,67 @@ export default class Field extends PIXI.Container {
         this._cellsContainer = new PIXI.Container();
         this.addChild(this._cellsContainer);
 
-        this._init();
+        this._model.sizeChangedHandler = this._onSizeChanged.bind(this);
+        this._model.cellChangedHandler = this._onCellChanged.bind(this);
+        this._model.rowRemovedHandler = this._onRowRemoved.bind(this);
     }
 
     // Private
 
-    _init() {
-        this._cellSprites = new Array(this._fieldLogic.width);
-        for (let x = 0; x < this._fieldLogic.width; ++x) {
-            this._cellSprites[x] = new Array(this._fieldLogic.height);
+    _onSizeChanged() {
+        this._cellSprites.length = this._model.width;
+        for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
+            if (this._cellSprites[fieldX] === undefined) {
+                this._cellSprites[fieldX] = new Array(this._model.height);
+            } else {
+                this._cellSprites[fieldX].length = this._model.height;
+            }
         }
 
         this._drawBackground();
-        this._drawField();
-
-        this._fieldLogic.addOnFieldChangedCallback(this._drawField.bind(this));
     }
 
-    _drawBackground() {
-        for (let fieldX = 0; fieldX < this._fieldLogic.width; ++fieldX) {
-            for (let fieldY = 0; fieldY < this._fieldLogic.height; ++fieldY) {
-                let bgSprite = SpritesPool.getSprite('field', 'background');
-                this._bgContainer.addChild(bgSprite);
-                bgSprite.x = fieldX * bgSprite.width;
-                bgSprite.y = fieldY * bgSprite.height;
+    _onCellChanged(fieldX, fieldY) {
+        let cellSprite = this._cellSprites[fieldX][fieldY];
+        if (cellSprite !== undefined) {
+            this._cellsContainer.removeChild(cellSprite);
+            SpritesPool.releaseSprite(cellSprite);
+        }
+
+        if (!this._model.isCellBusy(fieldX, fieldY)) {
+            this._cellSprites[fieldX][fieldY] = undefined;
+            return;
+        }
+
+        let blockType = this._model.getCell(fieldX, fieldY);
+        let spriteName = this._getSpriteNameForBlockType(blockType);
+        cellSprite = SpritesPool.getSprite('field', spriteName);
+
+        this._cellsContainer.addChild(cellSprite);
+        this._cellSprites[fieldX][fieldY] = cellSprite;
+
+        cellSprite.x = fieldX * cellSprite.width;
+        cellSprite.y = fieldY * cellSprite.height;
+    }
+
+    _onRowRemoved(fieldY) {
+        for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
+            let cellSprite = this._cellSprites[fieldX][fieldY];
+            if (cellSprite !== undefined) {
+                this._cellsContainer.removeChild(cellSprite);
+                SpritesPool.releaseSprite(cellSprite);
+                this._cellSprites[fieldX][fieldY] = undefined;
             }
         }
     }
 
-    _drawField() {
-        this._cellsContainer.removeChildren(0, this._cellsContainer.children.length);
-        for (let fieldX = 0; fieldX < this._fieldLogic.width; ++fieldX) {
-            for (let fieldY = 0; fieldY < this._fieldLogic.height; ++fieldY) {
-                let cellSprite = this._cellSprites[fieldX][fieldY];
-                this._cellSprites[fieldX][fieldY] = undefined;
-                if (cellSprite !== undefined) {
-                    this._cellsContainer.removeChild(cellSprite);
-                    SpritesPool.releaseSprite(cellSprite);
-                }
-
-                if (!this._fieldLogic.isCellBusy(fieldX, fieldY)) {
-                    continue;
-                }
-
-                let blockType = this._fieldLogic.getCellValue(fieldX, fieldY);
-                let spriteName = this._getSpriteNameForBlockType(blockType);
-                cellSprite = SpritesPool.getSprite('field', spriteName);
-
-                this._cellsContainer.addChild(cellSprite);
-                this._cellSprites[fieldX][fieldY] = cellSprite;
-
-                cellSprite.x = fieldX * cellSprite.width;
-                cellSprite.y = fieldY * cellSprite.height;
+    _drawBackground() {
+        for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
+            for (let fieldY = 0; fieldY < this._model.height; ++fieldY) {
+                let bgSprite = SpritesPool.getSprite('field', 'background');
+                this._bgContainer.addChild(bgSprite);
+                bgSprite.x = fieldX * bgSprite.width;
+                bgSprite.y = fieldY * bgSprite.height;
             }
         }
     }
