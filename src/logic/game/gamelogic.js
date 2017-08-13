@@ -23,7 +23,7 @@ export default class GameLogic {
         }
     }
 
-    slotOnStartGame(fieldWidth, fieldHeight) {
+    slotOnStartGameNeeded(fieldWidth, fieldHeight) {
         this._isGameStarted = true;
         this._waitTimer = 1000;
         this._fieldLogic.startGame(fieldWidth, fieldHeight);

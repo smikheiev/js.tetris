@@ -14,13 +14,15 @@ export default class TetrisConnector {
 
     // Private
     _connectLogic() {
-        Connector.connect(this.rootLogic, this.rootLogic.signalStartGameNeeded,
-            this.gameLogic, this.gameLogic.slotOnStartGame);
+        Connector.connect(this.mainMenuLogic, this.mainMenuLogic.signalStartGameNeeded,
+            this.rootLogic, this.rootLogic.slotOnStartGameNeeded);
+        Connector.connect(this.mainMenuLogic, this.mainMenuLogic.signalStartGameNeeded,
+            this.gameLogic, this.gameLogic.slotOnStartGameNeeded);
     }
 
     _connectManagers() {
         Connector.connect(this.assetsManager, this.assetsManager.signalLoadProgress,
-            this.rootLogic, this.rootLogic.slotOnAssetsLoadProgress);
+            this.preloaderLogic, this.preloaderLogic.slotOnAssetsLoadProgress);
         Connector.connect(this.assetsManager, this.assetsManager.signalLoadComplete,
             this.rootLogic, this.rootLogic.slotOnAssetsLoadComplete);
 
@@ -30,6 +32,8 @@ export default class TetrisConnector {
 
     // Logic getters
     get rootLogic() { return this._rootLogic; }
+    get preloaderLogic() { return this.rootLogic.preloaderLogic; }
+    get mainMenuLogic() { return this.rootLogic.mainMenuLogic; }
     get gameLogic() { return this.rootLogic.gameLogic; }
     get fieldLogic() { return this.gameLogic.fieldLogic; }
 
