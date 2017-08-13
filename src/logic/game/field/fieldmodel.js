@@ -3,39 +3,12 @@ import BlockType from '../../../const/blocktype'
 export default class FieldModel {
     constructor() {
         this._cells = new Array();
-
-        this._sizeChangedHandler = undefined;
-        this._cellChangedHandler = undefined;
-        this._rowRemovedHandler = undefined;
-    }
-
-    // Signals
-    signalSizeChanged() {
-        if (this._sizeChangedHandler) {
-            this._sizeChangedHandler();
-        }
-    }
-
-    signalCellChanged(x, y) {
-        if (this._cellChangedHandler) {
-            this._cellChangedHandler(x, y);
-        }
-    }
-
-    signalRowRemoved(y) {
-        if (this._rowRemovedHandler) {
-            this._rowRemovedHandler(y);
-        }
     }
 
     // Public
 
     get width() { return this._width; }
     get height() { return this._height; }
-
-    set sizeChangedHandler(fn) { this._sizeChangedHandler = fn; }
-    set cellChangedHandler(fn) { this._cellChangedHandler = fn; }
-    set rowRemovedHandler(fn) { this._rowRemovedHandler = fn; }
 
     setSize(width, height) {
         if (this._width !== width || this._height !== height) {
@@ -100,4 +73,10 @@ export default class FieldModel {
     _isCellPositionOk(x, y) {
         return (x >= 0 && x < this._width && y >= 0 && y < this._height);
     }
+
+    // Signals
+
+    signalSizeChanged() {}
+    signalCellChanged(x, y) {}
+    signalRowRemoved(y) {}
 }

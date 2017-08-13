@@ -1,4 +1,5 @@
 import SpritesPool from '../../../utils/spritespool'
+import Connector from '../../../utils/connector'
 import BlockType from '../../../const/blocktype'
 import * as PIXI from 'pixi.js'
 
@@ -17,14 +18,14 @@ export default class Field extends PIXI.Container {
         this._cellsContainer = new PIXI.Container();
         this.addChild(this._cellsContainer);
 
-        this._model.sizeChangedHandler = this._onSizeChanged.bind(this);
-        this._model.cellChangedHandler = this._onCellChanged.bind(this);
-        this._model.rowRemovedHandler = this._onRowRemoved.bind(this);
+        Connector.connect(this._model, this._model.signalSizeChanged, this, this._slotOnSizeChanged);
+        Connector.connect(this._model, this._model.signalCellChanged, this, this._slotOnCellChanged);
+        Connector.connect(this._model, this._model.signalRowRemoved, this, this._slotOnRowRemoved);
     }
 
-    // Private
+    // Private slots
 
-    _onSizeChanged() {
+    _slotOnSizeChanged() {
         this._cellSprites.length = this._model.width;
         for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
             if (this._cellSprites[fieldX] === undefined) {
@@ -37,7 +38,7 @@ export default class Field extends PIXI.Container {
         this._drawBackground();
     }
 
-    _onCellChanged(fieldX, fieldY) {
+    _slotOnCellChanged(fieldX, fieldY) {
         let cellSprite = this._cellSprites[fieldX][fieldY];
         if (cellSprite !== undefined) {
             this._cellsContainer.removeChild(cellSprite);
@@ -60,7 +61,7 @@ export default class Field extends PIXI.Container {
         cellSprite.y = fieldY * cellSprite.height;
     }
 
-    _onRowRemoved(fieldY) {
+    _slotOnRowRemoved(fieldY) {
         for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
             let cellSprite = this._cellSprites[fieldX][fieldY];
             if (cellSprite !== undefined) {
@@ -70,6 +71,8 @@ export default class Field extends PIXI.Container {
             }
         }
     }
+
+    // Private
 
     _drawBackground() {
         for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
