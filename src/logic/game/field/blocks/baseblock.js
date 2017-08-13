@@ -15,8 +15,7 @@ export default class BaseBlock {
         this._fieldPositionY = 0;
     }
 
-    // Public
-
+    // Get/set
     get blockType() { return this._blockType; }
     get width() { return this._currentMatrix.length; }
     get height() { return this._currentMatrix[0].length; }
@@ -27,6 +26,7 @@ export default class BaseBlock {
     get fieldPositionY() { return this._fieldPositionY; }
     set fieldPositionY(value) { this._fieldPositionY = value; }
 
+    // Public
     isCellBusy(x, y) {
         if (!this._isCellPositionOk(x, y)) {
             return undefined;
@@ -45,7 +45,6 @@ export default class BaseBlock {
     }
 
     // Private
-
     _isCellPositionOk(x, y) {
         return (x >= 0 && x < this.width  && y >= 0 && y < this.height);
     }

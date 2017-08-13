@@ -13,10 +13,10 @@ export default class FieldLogic {
         ]
     }
 
-    // Public
-
+    // Get/set
     get model() { return this._model; }
 
+    // Public
     startGame(width, height) {
         this._model.setSize(width, height);
 
@@ -26,8 +26,29 @@ export default class FieldLogic {
         window.addEventListener("keydown", (event) => { this._handleKeyDown(event.keyCode); });
     }
 
-    // Private
+    moveDown() {
+        this._updateFieldForCurrentBlock(true);
+        this._currentBlock.fieldPositionY += 1;
 
+        let rollback = (this._getMaxBlockCellYOnField() >= this._model.height);
+        if (!rollback) {
+            rollback = this._isAnyBlockCellOverFieldCell();
+        }
+
+        if (rollback) {
+            this._currentBlock.fieldPositionY -= 1;
+            this._updateFieldForCurrentBlock(false);
+
+            let removedRows = this._removeFullRows();
+            this._moveRowsDownAfterRemoving(removedRows);
+
+            this._generateNewBlock();
+        } else {
+            this._updateFieldForCurrentBlock(false);
+        }
+    }
+
+    // Private
     _handleKeyDown(keyCode) {
         switch (keyCode) {
             case 37: // left
@@ -40,7 +61,7 @@ export default class FieldLogic {
                 this._moveRight();
                 break;
             case 40: // down
-                this._moveDown();
+                this.moveDown();
                 break;
         }
     }
@@ -75,28 +96,6 @@ export default class FieldLogic {
         }
 
         this._updateFieldForCurrentBlock(false);
-    }
-
-    _moveDown() {
-        this._updateFieldForCurrentBlock(true);
-        this._currentBlock.fieldPositionY += 1;
-
-        let rollback = (this._getMaxBlockCellYOnField() >= this._model.height);
-        if (!rollback) {
-            rollback = this._isAnyBlockCellOverFieldCell();
-        }
-
-        if (rollback) {
-            this._currentBlock.fieldPositionY -= 1;
-            this._updateFieldForCurrentBlock(false);
-
-            let removedRows = this._removeFullRows();
-            this._moveRowsDownAfterRemoving(removedRows);
-
-            this._generateNewBlock();
-        } else {
-            this._updateFieldForCurrentBlock(false);
-        }
     }
 
     // If there is no enough space on left or right for rotation -

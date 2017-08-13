@@ -1,5 +1,6 @@
-import AssetsManager from './utils/assetsmanager'
+import RootManager from './managers/rootmanager'
 import RootContainer from './view/rootcontainer'
+import TetrisConnector from './tetrisconnector'
 import RootLogic from './logic/rootlogic'
 import * as PIXI from 'pixi.js'
 
@@ -14,28 +15,19 @@ export default class Tetris {
         });
         document.body.appendChild(this._app.view);
 
-        this._assetsManager = new AssetsManager();
-        this._assetsManager.loadProgressHandler = this._onAssetsLoadProgress.bind(this);
-        this._assetsManager.loadCompleteHandler = this._onAssetsLoadComplete.bind(this);
-        this._assetsManager.load();
+        this._init();
     }
 
     // Private
-
-    _onAssetsLoadProgress(loader, resource) {
-        console.log('Loading [' + resource.url + '] ' + loader.progress + '%');
-    }
-
-    _onAssetsLoadComplete() {
+    _init() {
         this._rootLogic = new RootLogic();
+        this._rootManager = new RootManager();
+
+        this._tetrisConnector = new TetrisConnector(this._rootLogic, this._rootManager);
+        this._tetrisConnector.connectAll();
 
         this._rootContainer = new RootContainer(this._rootLogic);
         this._app.stage.addChild(this._rootContainer);
-
-        setTimeout(this._startGame.bind(this), 1000);
-    }
-
-    _startGame() {
-        this._rootLogic.startGame(10, 22)
+        this._rootManager.assetsManager.load();
     }
 }

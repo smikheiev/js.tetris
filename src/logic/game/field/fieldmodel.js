@@ -5,11 +5,11 @@ export default class FieldModel {
         this._cells = new Array();
     }
 
-    // Public
-
+    // Get/set
     get width() { return this._width; }
     get height() { return this._height; }
 
+    // Public
     setSize(width, height) {
         if (this._width !== width || this._height !== height) {
             this._width = width;
@@ -56,7 +56,6 @@ export default class FieldModel {
     }
 
     // Private
-
     _resizeCellsMatrix() {
         this._cells.length = this._width;
         for (let x = 0; x < this._width; ++x) {
@@ -75,7 +74,6 @@ export default class FieldModel {
     }
 
     // Signals
-
     signalSizeChanged() {}
     signalCellChanged(x, y) {}
     signalRowRemoved(y) {}

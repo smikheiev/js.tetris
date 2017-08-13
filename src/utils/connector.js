@@ -4,7 +4,6 @@ class Connector {
     }
 
     // Public
-
     connect(sender, signalFunction, receiver, slotFunction) {
         if (!this._checkConnectArguments(sender, signalFunction, receiver, slotFunction)) {
             return;
@@ -50,7 +49,6 @@ class Connector {
     }
 
     // Private
-
     _getKey(sender, signalFunction) {
         return sender.constructor.name + '_' + signalFunction.name;
     }
@@ -121,11 +119,11 @@ class Slot {
         this._slotFunctionName = slotFunctionName;
     }
 
-    // Public
-
+    // Get/set
     get receiver() { return this._receiver; }
     get slotFunctionName() { return this._slotFunctionName; }
 
+    // Public
     callSlot(signalArguments) {
         this._receiver[this._slotFunctionName].apply(this._receiver, signalArguments);
     }

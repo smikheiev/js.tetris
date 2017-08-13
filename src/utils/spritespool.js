@@ -6,7 +6,6 @@ class SpritesPool {
     }
 
     // Public
-
     getSprite(folderName, spriteName) {
         let pool = this._getPool(folderName, spriteName);
         return pool.getSprite();
@@ -18,7 +17,6 @@ class SpritesPool {
     }
 
     // Private
-
     _getPool(folderName, spriteName) {
         let key = folderName + spriteName;
         let pool;
@@ -42,7 +40,6 @@ class SpritePool {
     }
 
     // Public
-
     getSprite() {
         if (this._index === this._pool.length) {
             this._grow();
@@ -65,7 +62,6 @@ class SpritePool {
     }
 
     // Private
-
     _grow() {
         let prevLength = this._pool.length;
         let newLength = prevLength + 10; // TODO: remove hardcode

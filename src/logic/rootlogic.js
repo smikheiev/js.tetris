@@ -5,11 +5,18 @@ export default class RootLogic {
         this._gameLogic = new GameLogic();
     }
 
-    // Public
-
+    // Get/set
     get gameLogic() { return this._gameLogic; }
 
-    startGame(width, height) {
-        this._gameLogic.startGame(width, height);
+    // Public slots
+    slotOnAssetsLoadProgress(loader, resource) {
+        console.log('Loading [' + resource.url + '] ' + loader.progress + '%');
     }
+
+    slotOnAssetsLoadComplete() {
+        this.signalStartGameNeeded(10, 22);
+    }
+
+    // Signals
+    signalStartGameNeeded(fieldWidth, fieldHeight) {}
 }

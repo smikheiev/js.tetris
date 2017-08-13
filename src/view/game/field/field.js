@@ -24,7 +24,6 @@ export default class Field extends PIXI.Container {
     }
 
     // Private slots
-
     _slotOnSizeChanged() {
         this._cellSprites.length = this._model.width;
         for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
@@ -73,7 +72,6 @@ export default class Field extends PIXI.Container {
     }
 
     // Private
-
     _drawBackground() {
         for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
             for (let fieldY = 0; fieldY < this._model.height; ++fieldY) {
