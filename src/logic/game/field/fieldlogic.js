@@ -42,6 +42,11 @@ export default class FieldLogic {
             let removedRows = this._removeFullRows();
             this._moveRowsDownAfterRemoving(removedRows);
 
+            if (this._isBlockOnFieldTop()) {
+                this.signalBlockLockedOnFieldTop();
+                return;
+            }
+
             this._generateNewBlock();
         } else {
             this._updateFieldForCurrentBlock(false);
@@ -235,7 +240,7 @@ export default class FieldLogic {
             this._currentBlock = this._blockRepository.getRandomBlock();
         }
         this._currentBlock.fieldPositionX = Math.ceil((this._model.width - this._currentBlock.width) / 2);
-        this._currentBlock.fieldPositionY = -this._currentBlock.height;
+        this._currentBlock.fieldPositionY = -this._currentBlock.height + 1;
     }
 
     _removeFullRows() {
@@ -282,10 +287,29 @@ export default class FieldLogic {
         }
     }
 
+    _isBlockOnFieldTop() {
+        for (let blockY = 0; blockY < this._currentBlock.height; ++blockY) {
+            for (let blockX = 0; blockX < this._currentBlock.width; ++blockX) {
+                if (!this._currentBlock.isCellBusy(blockX, blockY)) {
+                    continue;
+                }
+
+                let fieldY = this._currentBlock.fieldPositionY + blockY;
+                if (fieldY <= 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     _isCellPositionOk(x, y) {
         if (x >= 0 && x < this._model.width && y >= 0 && y < this._model.height) {
             return true;
         }
         return false;
     }
+
+    // Signals
+    signalBlockLockedOnFieldTop() {}
 }

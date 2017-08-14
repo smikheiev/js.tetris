@@ -28,4 +28,12 @@ export default class GameLogic {
         this._waitTimer = 1000;
         this._fieldLogic.startGame(fieldWidth, fieldHeight);
     }
+
+    slotOnBlockLockedOnFieldTop() {
+        this._isGameStarted = false;
+        this.signalGameEnded();
+    }
+
+    // Signals
+    signalGameEnded() {}
 }
