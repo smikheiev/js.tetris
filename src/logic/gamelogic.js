@@ -183,7 +183,7 @@ export default class GameLogic {
         } else {
             newBlock = this._blocksRepository.getRandomBlock();
         }
-        newBlock.fieldPositionX = Math.ceil((this._width - newBlock.width) / 2);
+        newBlock.fieldPositionX = (this._width - newBlock.width) >> 1;
         newBlock.fieldPositionY = -newBlock.height;
 
         this._setCurrentBlock(newBlock);

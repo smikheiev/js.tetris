@@ -1,3 +1,4 @@
+import TextHelpers from '../../helpers/texthelpers'
 import Connector from '../../utils/connector'
 import Global from '../../const/global'
 import * as PIXI from 'pixi.js'
@@ -9,21 +10,23 @@ export default class PreloaderScene extends PIXI.Container {
         this._viewLogic = preloaderViewLogic;
         this._viewModel = preloaderViewLogic.viewModel;
 
-        let style = {
-            fontFamily: 'Verdana',
-            fontSize: 22,
-            fill: 'white'
-        }
+        let container = new PIXI.Container();
 
-        let loadingText = new PIXI.Text('Loading...', style);
-        loadingText.anchor.set(0.5, 0.5);
-        loadingText.position.set(Global.WIDTH / 2, Global.HEIGHT / 2);
-        this.addChild(loadingText);
+        let loadingText = new PIXI.Text('Loading...', TextHelpers.getTextStyle(22));
 
-        this._percentText = new PIXI.Text('', style);
-        this._percentText.anchor.set(0, 0.5);
-        this._percentText.position.set(loadingText.x + loadingText.width / 2 + 5, loadingText.y);
-        this.addChild(this._percentText);
+        this._percentText = new PIXI.Text('100%', TextHelpers.getTextStyle(22));
+        this._percentText.position.set(loadingText.x + loadingText.width + 5, 0);
+
+        container.addChild(loadingText);
+        container.addChild(this._percentText);
+        container.position.set(
+            (Global.WIDTH - container.width) >> 1,
+            (Global.HEIGHT - container.height) >> 1
+        )
+
+        this.addChild(container);
+
+        this._percentText.text = '';
 
         Connector.connect(this._viewModel, this._viewModel.signalPercentLoadedChanged,
             this, this._slotOnPercentLoadedChanged);
@@ -31,7 +34,7 @@ export default class PreloaderScene extends PIXI.Container {
 
     // Private slots
     _slotOnPercentLoadedChanged() {
-        this._percentText.text = this._viewModel.percentLoaded + ' %';
+        this._percentText.text = this._viewModel.percentLoaded + '%';
         console.log(this._viewModel.percentLoaded, this._percentText.text);
     }
 }

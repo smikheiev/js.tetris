@@ -1,3 +1,5 @@
+import SimpleButton from '../../uicomponents/simplebutton'
+import TextHelpers from '../../helpers/texthelpers'
 import Global from '../../const/global'
 import * as PIXI from 'pixi.js'
 
@@ -10,30 +12,25 @@ export default class GameEndScene extends PIXI.Container {
 
         let container = new PIXI.Container();
 
-        let gameEndText = new PIXI.Text("Game end", {
-            fontFamily: 'Verdana',
-            fontSize: 64,
-            fill: 'white'
-        });
-        gameEndText.anchor.set(0.5, 0);
+        let gameEndText = new PIXI.Text("Game over!", TextHelpers.getTextStyle(64));
         gameEndText.position.set(0, 0);
-        container.addChild(gameEndText);
 
-        let backToMenuButton = new PIXI.Text("Back to menu", {
-            fontFamily: 'Verdana',
-            fontSize: 32,
-            fill: 'white'
-        });
-        backToMenuButton.anchor.set(0.5, 0);
-        backToMenuButton.position.set(0, gameEndText.height + 25);
-        backToMenuButton.interactive = true;
-        backToMenuButton.buttonMode = true;
+        let backToMenuButton = new SimpleButton();
+        backToMenuButton.set({
+            text: 'Back to menu', width: 220, height: 44, fontSize: 28
+        })
+        backToMenuButton.position.set(
+            (gameEndText.width - backToMenuButton.width) >> 1,
+            gameEndText.height + 25
+        );
         backToMenuButton.on("mouseup", this._onBackToMenuButtonClicked.bind(this));
-        container.addChild(backToMenuButton);
 
+        container.addChild(gameEndText);
+        container.addChild(backToMenuButton);
         container.position.set(
-            Global.WIDTH / 2,
-            (Global.HEIGHT - container.height) / 2);
+            (Global.WIDTH - container.width) >> 1,
+            (Global.HEIGHT - container.height) >> 1);
+
         this.addChild(container);
     }
 

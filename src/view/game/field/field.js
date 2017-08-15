@@ -1,6 +1,8 @@
+import WhiteFrame from '../../../uicomponents/whiteframe'
 import SpritesPool from '../../../utils/spritespool'
 import Connector from '../../../utils/connector'
 import BlockType from '../../../const/blocktype'
+import Global from '../../../const/global'
 import * as PIXI from 'pixi.js'
 
 export default class Field extends PIXI.Container {
@@ -12,11 +14,18 @@ export default class Field extends PIXI.Container {
 
         this._cellSprites = [];
 
-        this._bgContainer = new PIXI.Container();
-        this.addChild(this._bgContainer);
+        this._frame = new WhiteFrame();
+        this._container = new PIXI.Container();
 
+        this._bgContainer = new PIXI.Container();
         this._cellsContainer = new PIXI.Container();
-        this.addChild(this._cellsContainer);
+
+        this._container.addChild(this._bgContainer);
+        this._container.addChild(this._cellsContainer);
+        this._container.position.set(Global.UI_GAME_PADDING, Global.UI_GAME_PADDING);
+
+        this.addChild(this._frame);
+        this.addChild(this._container);
 
         Connector.connect(this._viewModel, this._viewModel.signalSizeChanged, this, this._slotOnSizeChanged);
         Connector.connect(this._viewModel, this._viewModel.signalCellChanged, this, this._slotOnCellChanged);
@@ -34,6 +43,13 @@ export default class Field extends PIXI.Container {
         }
 
         this._drawBackground();
+
+        this._frame.setSize(
+            this._container.width + Global.UI_GAME_PADDING * 2,
+            this._container.height + Global.UI_GAME_PADDING * 2
+        )
+
+        this.signalSizeChanged();
     }
 
     _slotOnCellChanged(fieldX, fieldY) {
@@ -90,4 +106,7 @@ export default class Field extends PIXI.Container {
         }
         return '';
     }
+
+    // Signals
+    signalSizeChanged() {}
 }
