@@ -1,6 +1,6 @@
 import BlockType from '../../../const/blocktype'
 
-export default class FieldModel {
+export default class FieldViewModel {
     constructor() {
         this._cells = new Array();
     }
@@ -45,16 +45,6 @@ export default class FieldModel {
         return (cellValue !== undefined && cellValue !== null);
     }
 
-    clearRow(y) {
-        if (y >= 0 && y < this._height) {
-            for (let x = 0; x < this._width; ++x) {
-                this._cells[x][y] = null;
-            }
-
-            this.signalRowRemoved(y);
-        }
-    }
-
     // Private
     _resizeCellsMatrix() {
         this._cells.length = this._width;
@@ -76,5 +66,4 @@ export default class FieldModel {
     // Signals
     signalSizeChanged() {}
     signalCellChanged(x, y) {}
-    signalRowRemoved(y) {}
 }

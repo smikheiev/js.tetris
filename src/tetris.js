@@ -1,7 +1,8 @@
+import RootViewLogic from './viewlogic/rootviewlogic'
 import RootManager from './managers/rootmanager'
 import RootContainer from './view/rootcontainer'
 import TetrisConnector from './tetrisconnector'
-import RootLogic from './logic/rootlogic'
+import KeyCode from './const/keycode'
 import Global from './const/global'
 import * as PIXI from 'pixi.js'
 
@@ -21,15 +22,16 @@ export default class Tetris {
 
     // Private
     _init() {
-        this._rootLogic = new RootLogic();
+        this._rootViewLogic = new RootViewLogic();
         this._rootManager = new RootManager();
 
-        this._tetrisConnector = new TetrisConnector(this._rootLogic, this._rootManager);
+        this._tetrisConnector = new TetrisConnector(this._rootViewLogic, this._rootManager);
         this._tetrisConnector.connectAll();
 
-        this._rootContainer = new RootContainer(this._rootLogic);
+        this._rootContainer = new RootContainer(this._rootViewLogic);
         this._app.stage.addChild(this._rootContainer);
 
+        this._rootManager.keyboardManager.addKeysToHandle([KeyCode.KEY_LEFT, KeyCode.KEY_RIGHT, KeyCode.KEY_UP, KeyCode.KEY_DOWN]);
         this._rootManager.assetsManager.load();
     }
 }

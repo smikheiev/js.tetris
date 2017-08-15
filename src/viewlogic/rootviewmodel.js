@@ -1,6 +1,6 @@
 import SceneType from '../const/scenetype'
 
-export default class RootModel {
+export default class RootViewModel {
     constructor() {
         this._currentScene = SceneType.PRELOADER;
     }

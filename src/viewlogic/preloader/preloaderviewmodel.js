@@ -1,4 +1,4 @@
-export default class PreloaderModel {
+export default class PreloaderViewModel {
     constructor() {
         this._percentLoaded = 0.0;
     }

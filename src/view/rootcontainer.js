@@ -7,16 +7,16 @@ import GameScene from './game/gamescene'
 import * as PIXI from 'pixi.js'
 
 export default class RootContainer extends PIXI.Container {
-    constructor(rootLogic) {
+    constructor(rootViewLogic) {
         super();
 
-        this._logic = rootLogic;
-        this._model = rootLogic.model;
+        this._viewLogic = rootViewLogic;
+        this._viewModel = rootViewLogic.viewModel;
 
-        this._preloaderScene = new PreloaderScene(rootLogic.preloaderLogic);
-        this._mainMenuScene = new MainMenuScene(rootLogic.mainMenuLogic);
-        this._gameEndScene = new GameEndScene(rootLogic.gameEndLogic);
-        this._gameScene = new GameScene(rootLogic.gameLogic);
+        this._preloaderScene = new PreloaderScene(rootViewLogic.preloaderViewLogic);
+        this._mainMenuScene = new MainMenuScene(rootViewLogic.mainMenuViewLogic);
+        this._gameEndScene = new GameEndScene(rootViewLogic.gameEndViewLogic);
+        this._gameScene = new GameScene(rootViewLogic.gameViewLogic);
 
         this._mainMenuScene.visible = false;
         this._gameEndScene.visible = false;
@@ -27,13 +27,13 @@ export default class RootContainer extends PIXI.Container {
         this.addChild(this._gameEndScene);
         this.addChild(this._gameScene);
 
-        Connector.connect(this._model, this._model.signalCurrentSceneChanged,
+        Connector.connect(this._viewModel, this._viewModel.signalCurrentSceneChanged,
             this, this._slotOnCurrentSceneChanged);
     }
 
     // Private slots
     _slotOnCurrentSceneChanged() {
-        switch (this._model.currentScene) {
+        switch (this._viewModel.currentScene) {
             case SceneType.MAINMENU:
                 this._preloaderScene.visible = false;
                 this._mainMenuScene.visible = true;

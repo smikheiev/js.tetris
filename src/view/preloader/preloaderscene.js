@@ -3,11 +3,11 @@ import Global from '../../const/global'
 import * as PIXI from 'pixi.js'
 
 export default class PreloaderScene extends PIXI.Container {
-    constructor(preloaderLogic) {
+    constructor(preloaderViewLogic) {
         super();
 
-        this._logic = preloaderLogic;
-        this._model = preloaderLogic.model;
+        this._viewLogic = preloaderViewLogic;
+        this._viewModel = preloaderViewLogic.viewModel;
 
         let style = {
             fontFamily: 'Verdana',
@@ -25,13 +25,13 @@ export default class PreloaderScene extends PIXI.Container {
         this._percentText.position.set(loadingText.x + loadingText.width / 2 + 5, loadingText.y);
         this.addChild(this._percentText);
 
-        Connector.connect(this._model, this._model.signalPercentLoadedChanged,
+        Connector.connect(this._viewModel, this._viewModel.signalPercentLoadedChanged,
             this, this._slotOnPercentLoadedChanged);
     }
 
     // Private slots
     _slotOnPercentLoadedChanged() {
-        this._percentText.text = this._model.percentLoaded + ' %';
-        console.log(this._model.percentLoaded, this._percentText.text);
+        this._percentText.text = this._viewModel.percentLoaded + ' %';
+        console.log(this._viewModel.percentLoaded, this._percentText.text);
     }
 }

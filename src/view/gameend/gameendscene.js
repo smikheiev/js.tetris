@@ -2,11 +2,11 @@ import Global from '../../const/global'
 import * as PIXI from 'pixi.js'
 
 export default class GameEndScene extends PIXI.Container {
-    constructor(gameEndLogic) {
+    constructor(gameEndViewLogic) {
         super();
 
-        this._logic = gameEndLogic;
-        this._model = gameEndLogic.model;
+        this._viewLogic = gameEndViewLogic;
+        this._viewModel = gameEndViewLogic.viewModel;
 
         let container = new PIXI.Container();
 
@@ -39,6 +39,6 @@ export default class GameEndScene extends PIXI.Container {
 
     // Private
     _onBackToMenuButtonClicked(e) {
-        this._logic.signalBackToMainMenuNeeded();
+        this._viewLogic.signalBackToMainMenuNeeded();
     }
 }

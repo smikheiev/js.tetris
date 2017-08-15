@@ -1,4 +1,4 @@
-import BlockType from '../../../../const/blocktype'
+import BlockType from '../../const/blocktype'
 import BaseBlock from './baseblock'
 
 export default class BlockI extends BaseBlock {

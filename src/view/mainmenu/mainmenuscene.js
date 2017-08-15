@@ -2,11 +2,11 @@ import Global from '../../const/global'
 import * as PIXI from 'pixi.js'
 
 export default class MainMenuScene extends PIXI.Container {
-    constructor(mainMenuLogic) {
+    constructor(mainMenuViewLogic) {
         super();
 
-        this._logic = mainMenuLogic;
-        this._model = mainMenuLogic.model;
+        this._viewLogic = mainMenuViewLogic;
+        this._viewModel = mainMenuViewLogic.viewModel;
 
         let style = {
             fontFamily: 'Verdana',
@@ -40,10 +40,10 @@ export default class MainMenuScene extends PIXI.Container {
 
     // Private
     _onNormalFieldButtonClicked(e) {
-        this._logic.signalStartGameNeeded(10, 22);
+        this._viewLogic.signalStartGameNeeded(10, 22);
     }
 
     _onBigFieldButtonClicked(e) {
-        this._logic.signalStartGameNeeded(15, 33);
+        this._viewLogic.signalStartGameNeeded(15, 33);
     }
 }

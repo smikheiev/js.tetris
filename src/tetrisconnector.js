@@ -1,8 +1,8 @@
 import Connector from './utils/connector'
 
 export default class TetrisConnector {
-    constructor(rootLogic, rootManager) {
-        this._rootLogic = rootLogic;
+    constructor(rootViewLogic, rootManager) {
+        this._rootViewLogic = rootViewLogic;
         this._rootManager = rootManager;
     }
 
@@ -14,41 +14,44 @@ export default class TetrisConnector {
 
     // Private
     _connectLogic() {
-        Connector.connect(this.mainMenuLogic, this.mainMenuLogic.signalStartGameNeeded,
-            this.rootLogic, this.rootLogic.slotOnStartGameNeeded);
-        Connector.connect(this.mainMenuLogic, this.mainMenuLogic.signalStartGameNeeded,
-            this.gameLogic, this.gameLogic.slotOnStartGameNeeded);
+        Connector.connect(this.mainMenuViewLogic, this.mainMenuViewLogic.signalStartGameNeeded,
+            this.rootViewLogic, this.rootViewLogic.slotOnStartGameNeeded);
+        Connector.connect(this.mainMenuViewLogic, this.mainMenuViewLogic.signalStartGameNeeded,
+            this.gameViewLogic, this.gameViewLogic.slotOnStartGameNeeded);
 
-        Connector.connect(this.fieldLogic, this.fieldLogic.signalBlockLockedOnFieldTop,
-            this.gameLogic, this.gameLogic.slotOnBlockLockedOnFieldTop);
+        Connector.connect(this.gameViewLogic, this.gameViewLogic.signalGameEnded,
+            this.rootViewLogic, this.rootViewLogic.slotOnGameEnded);
+        Connector.connect(this.gameViewLogic, this.gameViewLogic.signalGameEnded,
+            this.fieldViewLogic, this.fieldViewLogic.slotOnGameEnded);
 
-        Connector.connect(this.gameLogic, this.gameLogic.signalGameEnded,
-            this.rootLogic, this.rootLogic.slotOnGameEnded);
-
-        Connector.connect(this.gameEndLogic, this.gameEndLogic.signalBackToMainMenuNeeded,
-            this.rootLogic, this.rootLogic.slotOnBackToMainMenuNeeded);
+        Connector.connect(this.gameEndViewLogic, this.gameEndViewLogic.signalBackToMainMenuNeeded,
+            this.rootViewLogic, this.rootViewLogic.slotOnBackToMainMenuNeeded);
     }
 
     _connectManagers() {
         Connector.connect(this.assetsManager, this.assetsManager.signalLoadProgress,
-            this.preloaderLogic, this.preloaderLogic.slotOnAssetsLoadProgress);
+            this.preloaderViewLogic, this.preloaderViewLogic.slotOnAssetsLoadProgress);
         Connector.connect(this.assetsManager, this.assetsManager.signalLoadComplete,
-            this.rootLogic, this.rootLogic.slotOnAssetsLoadComplete);
+            this.rootViewLogic, this.rootViewLogic.slotOnAssetsLoadComplete);
 
         Connector.connect(this.tickManager, this.tickManager.signalTick,
-            this.gameLogic, this.gameLogic.slotOnTick);
+            this.gameViewLogic, this.gameViewLogic.slotOnTick);
+
+        Connector.connect(this.keyboardManager, this.keyboardManager.signalKeyDown,
+            this.gameViewLogic, this.gameViewLogic.slotOnKeyDown);
     }
 
     // Logic getters
-    get rootLogic() { return this._rootLogic; }
-    get preloaderLogic() { return this.rootLogic.preloaderLogic; }
-    get mainMenuLogic() { return this.rootLogic.mainMenuLogic; }
-    get gameEndLogic() { return this.rootLogic.gameEndLogic; }
-    get gameLogic() { return this.rootLogic.gameLogic; }
-    get fieldLogic() { return this.gameLogic.fieldLogic; }
+    get rootViewLogic() { return this._rootViewLogic; }
+    get preloaderViewLogic() { return this.rootViewLogic.preloaderViewLogic; }
+    get mainMenuViewLogic() { return this.rootViewLogic.mainMenuViewLogic; }
+    get gameEndViewLogic() { return this.rootViewLogic.gameEndViewLogic; }
+    get gameViewLogic() { return this.rootViewLogic.gameViewLogic; }
+    get fieldViewLogic() { return this.gameViewLogic.fieldViewLogic; }
 
     // Manager getters
     get rootManager() { return this._rootManager; }
+    get keyboardManager() { return this._rootManager.keyboardManager; }
     get assetsManager() { return this.rootManager.assetsManager; }
     get tickManager() { return this.rootManager.tickManager; }
 }

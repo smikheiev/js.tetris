@@ -1,4 +1,4 @@
-import BlockType from '../../../../const/blocktype'
+import BlockType from '../../const/blocktype'
 import BlockI from './block_i'
 import BlockJ from './block_j'
 import BlockL from './block_l'
@@ -24,7 +24,6 @@ export default class BlocksRepository {
     }
 
     // Public
-
     getRandomBlock() {
         let rand = Math.floor(Math.random() * this._blocksCount);
         let blockType = this._blockTypes[rand];

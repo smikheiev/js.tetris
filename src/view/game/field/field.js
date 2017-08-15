@@ -4,11 +4,11 @@ import BlockType from '../../../const/blocktype'
 import * as PIXI from 'pixi.js'
 
 export default class Field extends PIXI.Container {
-    constructor(fieldLogic) {
+    constructor(fieldViewLogic) {
         super()
 
-        this._logic = fieldLogic;
-        this._model = fieldLogic.model;
+        this._viewLogic = fieldViewLogic;
+        this._viewModel = fieldViewLogic.viewModel;
 
         this._cellSprites = [];
 
@@ -18,19 +18,18 @@ export default class Field extends PIXI.Container {
         this._cellsContainer = new PIXI.Container();
         this.addChild(this._cellsContainer);
 
-        Connector.connect(this._model, this._model.signalSizeChanged, this, this._slotOnSizeChanged);
-        Connector.connect(this._model, this._model.signalCellChanged, this, this._slotOnCellChanged);
-        Connector.connect(this._model, this._model.signalRowRemoved, this, this._slotOnRowRemoved);
+        Connector.connect(this._viewModel, this._viewModel.signalSizeChanged, this, this._slotOnSizeChanged);
+        Connector.connect(this._viewModel, this._viewModel.signalCellChanged, this, this._slotOnCellChanged);
     }
 
     // Private slots
     _slotOnSizeChanged() {
-        this._cellSprites.length = this._model.width;
-        for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
+        this._cellSprites.length = this._viewModel.width;
+        for (let fieldX = 0; fieldX < this._viewModel.width; ++fieldX) {
             if (this._cellSprites[fieldX] === undefined) {
-                this._cellSprites[fieldX] = new Array(this._model.height);
+                this._cellSprites[fieldX] = new Array(this._viewModel.height);
             } else {
-                this._cellSprites[fieldX].length = this._model.height;
+                this._cellSprites[fieldX].length = this._viewModel.height;
             }
         }
 
@@ -44,12 +43,12 @@ export default class Field extends PIXI.Container {
             SpritesPool.releaseSprite(cellSprite);
         }
 
-        if (!this._model.isCellBusy(fieldX, fieldY)) {
+        if (!this._viewModel.isCellBusy(fieldX, fieldY)) {
             this._cellSprites[fieldX][fieldY] = undefined;
             return;
         }
 
-        let blockType = this._model.getCell(fieldX, fieldY);
+        let blockType = this._viewModel.getCell(fieldX, fieldY);
         let spriteName = this._getSpriteNameForBlockType(blockType);
         cellSprite = SpritesPool.getSprite('field', spriteName);
 
@@ -60,21 +59,10 @@ export default class Field extends PIXI.Container {
         cellSprite.y = fieldY * cellSprite.height;
     }
 
-    _slotOnRowRemoved(fieldY) {
-        for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
-            let cellSprite = this._cellSprites[fieldX][fieldY];
-            if (cellSprite !== undefined) {
-                this._cellsContainer.removeChild(cellSprite);
-                SpritesPool.releaseSprite(cellSprite);
-                this._cellSprites[fieldX][fieldY] = undefined;
-            }
-        }
-    }
-
     // Private
     _drawBackground() {
-        for (let fieldX = 0; fieldX < this._model.width; ++fieldX) {
-            for (let fieldY = 0; fieldY < this._model.height; ++fieldY) {
+        for (let fieldX = 0; fieldX < this._viewModel.width; ++fieldX) {
+            for (let fieldY = 0; fieldY < this._viewModel.height; ++fieldY) {
                 let bgSprite = SpritesPool.getSprite('field', 'background');
                 this._bgContainer.addChild(bgSprite);
                 bgSprite.x = fieldX * bgSprite.width;
