@@ -13,7 +13,7 @@ export default class GameScene extends PIXI.Container {
         this._field = new Field(gameViewLogic.fieldViewLogic);
         this._field.position.set(Global.UI_GAME_PADDING, Global.UI_GAME_PADDING);
 
-        this._score = new Score();
+        this._score = new Score(gameViewLogic.scoreViewLogic);
 
         this.addChild(this._field);
         this.addChild(this._score);

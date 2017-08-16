@@ -3,6 +3,7 @@ import BlocksRepository from './blocks/blocksrepository'
 import FullRowChecker from './fullrowchecker'
 import GameEndChecker from './gameendchecker'
 import BlockType from '../const/blocktype'
+import ScoreCounter from './scorecounter'
 import FieldMatrix from './fieldmatrix'
 
 export default class GameLogic {
@@ -11,6 +12,7 @@ export default class GameLogic {
         this._height = height;
         this._callbacks = callbacks;
 
+        this._scoreCounter = new ScoreCounter();
         this._blocksRepository = new BlocksRepository();
         this._fieldMatrix = new FieldMatrix(width, height);
         this._fullRowChecker = new FullRowChecker(this._fieldMatrix);
@@ -124,6 +126,8 @@ export default class GameLogic {
         } else {
             this._generateNewBlock();
         }
+
+        this._scoreCounter.roundEnded();
     }
 
     _lockCurrentBlockCells() {
@@ -143,13 +147,19 @@ export default class GameLogic {
 
     _removeFullRows(fullRows) {
         for (let i = 0; i < fullRows.length; ++i) {
+            this._scoreCounter.rowWillBeRemoved();
+
             let y = fullRows[i];
             for (let x = 0; x < this._width; ++x) {
                 this._fieldMatrix.setCellAsFree(x, y);
 
+                this._scoreCounter.cellRemoved();
+
                 this._callbacks.callbackRemoveCell(x, y);
             }
         }
+
+        this._callbacks.callbackScoreChanged(this._scoreCounter.currentScore);
     }
 
     _moveRowsDown(removedRows) {

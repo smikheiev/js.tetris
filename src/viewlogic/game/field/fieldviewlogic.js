@@ -11,10 +11,6 @@ export default class FieldViewLogic {
     get viewModel() { return this._viewModel; }
 
     // Public
-    startGame(width, height) {
-        this._viewModel.setSize(width, height);
-    }
-
     setCellValue(x, y, value) {
         this.viewModel.setCell(x, y, value);
     }
@@ -23,16 +19,25 @@ export default class FieldViewLogic {
         this.viewModel.setCell(x, y, null);
     }
 
-    removeCell(x, y) {
-        this.viewModel.setCell(x, y, null);
+    // Public slots
+    slotOnStartGameNeeded(fieldWidth, fieldHeight) {
+        this._viewModel.setSize(fieldWidth, fieldHeight);
     }
 
-    // Public slots
+    slotOnRemoveCell(x, y) {
+        this._removeCell(x, y);
+    }
+
     slotOnGameEnded() {
         for (let x = 0; x < this._viewModel.width; ++x) {
             for (let y = 0; y < this._viewModel.height; ++y) {
-                this.removeCell(x, y);
+                this._removeCell(x, y);
             }
         }
+    }
+
+    // Private
+    _removeCell(x, y) {
+        this.viewModel.setCell(x, y, null);
     }
 }

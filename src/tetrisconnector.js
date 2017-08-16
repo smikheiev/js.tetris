@@ -18,11 +18,21 @@ export default class TetrisConnector {
             this.rootViewLogic, this.rootViewLogic.slotOnStartGameNeeded);
         Connector.connect(this.mainMenuViewLogic, this.mainMenuViewLogic.signalStartGameNeeded,
             this.gameViewLogic, this.gameViewLogic.slotOnStartGameNeeded);
+        Connector.connect(this.mainMenuViewLogic, this.mainMenuViewLogic.signalStartGameNeeded,
+            this.fieldViewLogic, this.fieldViewLogic.slotOnStartGameNeeded);
+        Connector.connect(this.mainMenuViewLogic, this.mainMenuViewLogic.signalStartGameNeeded,
+            this.scoreViewLogic, this.fieldViewLogic.slotOnStartGameNeeded);
 
         Connector.connect(this.gameViewLogic, this.gameViewLogic.signalGameEnded,
             this.rootViewLogic, this.rootViewLogic.slotOnGameEnded);
         Connector.connect(this.gameViewLogic, this.gameViewLogic.signalGameEnded,
             this.fieldViewLogic, this.fieldViewLogic.slotOnGameEnded);
+
+        Connector.connect(this.gameViewLogic, this.gameViewLogic.signalRemoveCell,
+            this.fieldViewLogic, this.fieldViewLogic.slotOnRemoveCell);
+
+        Connector.connect(this.gameViewLogic, this.gameViewLogic.signalScoreChanged,
+            this.scoreViewLogic, this.scoreViewLogic.slotOnScoreChanged);
 
         Connector.connect(this.gameEndViewLogic, this.gameEndViewLogic.signalBackToMainMenuNeeded,
             this.rootViewLogic, this.rootViewLogic.slotOnBackToMainMenuNeeded);
@@ -48,6 +58,7 @@ export default class TetrisConnector {
     get gameEndViewLogic() { return this.rootViewLogic.gameEndViewLogic; }
     get gameViewLogic() { return this.rootViewLogic.gameViewLogic; }
     get fieldViewLogic() { return this.gameViewLogic.fieldViewLogic; }
+    get scoreViewLogic() { return this.gameViewLogic.scoreViewLogic; }
 
     // Manager getters
     get rootManager() { return this._rootManager; }

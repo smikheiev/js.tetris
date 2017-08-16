@@ -1,34 +1,52 @@
 import WhiteFrame from '../../../uicomponents/whiteframe'
 import TextHelpers from '../../../helpers/texthelpers'
+import Connector from '../../../utils/connector'
 import Global from '../../../const/global'
 import * as PIXI from 'pixi.js'
 
 export default class Score extends PIXI.Container {
-    constructor() {
+    constructor(scoreViewLogic) {
         super();
 
+        this._viewLogic = scoreViewLogic;
+        this._viewModel = scoreViewLogic.viewModel;
+
         let frame = new WhiteFrame();
-        let container = new PIXI.Container();
+        this._container = new PIXI.Container();
 
         let titleText = new PIXI.Text('YOUR SCORE', TextHelpers.getTextStyle(16));
-        let scoreValueText = new PIXI.Text('888888888', TextHelpers.getTextStyle(22));
+        this._scoreValueText = new PIXI.Text('888888888', TextHelpers.getTextStyle(22));
 
-        titleText.position.set((scoreValueText.width - titleText.width) >> 1, 0);
-        scoreValueText.position.set(0, titleText.height + 5);
+        titleText.position.set((this._scoreValueText.width - titleText.width) >> 1, 0);
+        this._scoreValueText.position.set(0, titleText.height + 5);
 
-        container.addChild(titleText);
-        container.addChild(scoreValueText);
-        container.position.set(Global.UI_GAME_PADDING, Global.UI_GAME_PADDING);
+        this._container.addChild(titleText);
+        this._container.addChild(this._scoreValueText);
+        this._container.position.set(Global.UI_GAME_PADDING, Global.UI_GAME_PADDING);
 
         frame.setSize(
-            container.width + Global.UI_GAME_PADDING * 2,
-            container.height + Global.UI_GAME_PADDING * 2
+            this._container.width + Global.UI_GAME_PADDING * 2,
+            this._container.height + Global.UI_GAME_PADDING * 2
         );
 
         this.addChild(frame);
-        this.addChild(container);
+        this.addChild(this._container);
 
-        scoreValueText.text = '0';
-        scoreValueText.position.x = ((container.width - scoreValueText.width) >> 1);
+        this._scoreValueText.text = '0';
+        this._updateScoreValueTextPosition();
+
+        Connector.connect(this._viewModel, this._viewModel.signalScoreChanged,
+            this, this._slotOnScoreChanged);
+    }
+
+    // Private slots
+    _slotOnScoreChanged() {
+        this._scoreValueText.text = '' + this._viewModel.score;
+        this._updateScoreValueTextPosition();
+    }
+
+    // Private
+    _updateScoreValueTextPosition() {
+        this._scoreValueText.position.x = ((this._container.width - this._scoreValueText.width) >> 1);
     }
 }
